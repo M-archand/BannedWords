@@ -1,27 +1,72 @@
 ﻿﻿using CounterStrikeSharp.API.Core;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace BannedWords
 {
-    public class BanSettings
+    public class BanSettingsGroup
     {
         [JsonPropertyName("PlayerBanType")]
-        public string PlayerBanType { get; set; } = "silence";
+        public string? PlayerBanType { get; set; }
 
         [JsonPropertyName("DurationInMinutes")]
-        public int DurationInMinutes { get; set; } = 5;
+        public string? DurationInMinutes { get; set; }
+
+        [JsonPropertyName("EnableReason")]
+        public required bool EnableReason { get; set; }
+
+        [JsonPropertyName("PrintToPlayerChat")]
+        public required bool PrintToPlayerChat { get; set; }
+
+        [JsonPropertyName("PrintToAllChat")]
+        public required bool PrintToAllChat { get; set; }
+
+        [JsonPropertyName("BannedWords")]
+        public required string[] BannedWords { get; set; }
+
+        [JsonIgnore]
+        public Regex[] CompiledBannedWords { get; set; } = [];
     }
 
     public class BannedWordsConfig : BasePluginConfig
     {
-        [JsonPropertyName("BanSettings")]
-        public BanSettings BanSettings { get; set; } = new BanSettings();
+        [JsonPropertyName("BanSettingsGroups")]
+        public List<BanSettingsGroup> BanSettingsGroups { get; set; } = new List<BanSettingsGroup>
+        {
+            new BanSettingsGroup
+            {
+                PlayerBanType = "silence",
+                DurationInMinutes = "5",
+                EnableReason = true,
+                PrintToPlayerChat = true,
+                PrintToAllChat = true,
+                BannedWords = ["(?i)word1", "(?i)word2", "(?i)word3"]
+            },
+            new BanSettingsGroup
+            {
+                PlayerBanType = "gag",
+                DurationInMinutes = "10",
+                EnableReason = true,
+                PrintToPlayerChat = true,
+                PrintToAllChat = true,
+                BannedWords = ["(?i)word4", "(?i)word5", "(?i)word6"]
+            }
+        };
 
-        [JsonPropertyName("BannedWords")]
-        public string[] BannedWords { get; set; } = new[] { "word1", "word2", "word3" };
+        [JsonPropertyName("ReloadPermission")]
+        public string ReloadPermission { get; set; } = "@css/admin";
 
+        [JsonPropertyName("WhitelistPermission")]
+        public string WhitelistPermission { get; set; } = "@css/admin";
+
+        [JsonPropertyName("ExcludeStartsWith")]
+        public string ExcludeStartsWith { get; set; } = "!/.";
+
+        [JsonIgnore]
+        public HashSet<char> ExcludedStartCharacters { get; set; } = [];
+        
         [JsonPropertyName("ConfigVersion")]
-        public override int Version { get; set; } = 1;
+        public override int Version { get; set; } = BannedWords.ExpectedConfigVersion;
     }
 
     public partial class BannedWords : BasePlugin, IPluginConfig<BannedWordsConfig>

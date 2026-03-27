@@ -1,7 +1,14 @@
 {
-  "silencemsgplayer": " {Red}[Server] - {Default}You have automatically been silenced for {0} minutes due to {1}",
-  "silencemsgserver": " {Red}[Server] - {LightRed}{0} {Default}has automatically been silenced due to {1}",
-  "gagmsgplayer": " {Red}[Server] - {Default}You have automatically been gagged for {0} minutes due to {1}",
-  "gagmsgserver": " {Red}[Server] - {LightRed}{0} {Default}has automatically been gagged due to {1}",
-  "banreason": "using a banned word."
+  "silencemsgplayer": " {Lime}[SERVER] {Default}You have automatically been silenced for {0} minutes {1}",
+  "silencemsgserver": " {Lime}[SERVER] {LightRed}{0} {Default}has automatically been silenced {1}",
+  "gagmsgplayer": " {Lime}[SERVER] {Default}You have automatically been gagged for {0} minutes {1}",
+  "gagmsgserver": " {Lime}[SERVER] {LightRed}{0} {Default}has automatically been gagged{1}",
+  "mutemsgplayer": " {Lime}[SERVER] {Default}You have automatically been muted for {0} minutes {1}",
+  "mutemsgserver": " {Lime}[SERVER] {LightRed}{0} {Default}has automatically been muted{1}",
+  "kickmsgplayer": " {Lime}[SERVER] {Default}You have been automatically kicked{1}",
+  "kickmsgserver": " {Lime}[SERVER] {LightRed}{0} {Default}has automatically been kicked {1}",
+  "banmsgplayer": " {Lime}[SERVER] {Default}You have been automatically banned for {0} minutes {1}",
+  "banmsgserver": " {Lime}[SERVER] {LightRed}{0} {Default}has automatically been banned {1}",
+  "banreason": "Banned Phrase",
+  "baninfo": " {Lime}[SERVER] {Default}Naughty naughty! That phrase isn't allowed. {LightRed}RULES: {Default}No Racism, Sexism, Homophobia, Transphobia, Politics. Don't be an asshole."
 }
