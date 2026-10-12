@@ -173,7 +173,16 @@ namespace BannedWords
                 return;
             }
 
-            if (duration.Length > 0 && !DurationPattern.IsMatch(duration))
+            if (playerBanType == "kick")
+            {
+                duration = string.Empty; // kick takes no time arg
+            }
+            else if (duration.Length == 0)
+            {
+                Logger.LogWarning("DurationInMinutes is missing for PlayerBanType '{PlayerBanType}'. Falling back to 1 minute, add DurationInMinutes to the config.", group.PlayerBanType);
+                duration = "1";
+            }
+            else if (!DurationPattern.IsMatch(duration))
             {
                 Logger.LogWarning(
                     "Invalid DurationInMinutes '{DurationInMinutes}' for PlayerBanType '{PlayerBanType}'. Use a number of minutes such as \"10\". Matching messages will be blocked without punishment.",
