@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BannedWords
 {
-    public partial class BannedWords(ILogger<BannedWords> logger) : BasePlugin, IPluginConfig<BannedWordsConfig>
+    public partial class BannedWords : BasePlugin, IPluginConfig<BannedWordsConfig>
     {
         internal const int ExpectedConfigVersion = 1;
 
@@ -20,6 +20,7 @@ namespace BannedWords
 
         public override void Load(bool hotReload)
         {
+            // Global listener on purpose: named "say"/"say_team" listeners stopped all filtering during in-game test
             AddCommandListener(null!, OnAnyCommandTrace, HookMode.Pre);
             AddCommand("css_reloadbannedwords", "Reloads the BannedWords config.", ReloadConfigCommand);
         }
@@ -31,15 +32,12 @@ namespace BannedWords
 
             if (Config.Version != ExpectedConfigVersion)
             {
-                BannedWordsDebug($"Config version mismatch detected: expected {ExpectedConfigVersion}, but got {Config.Version}.");
+                Logger.LogWarning(
+                    "Config version mismatch detected: expected {ExpectedConfigVersion}, but got {ConfigVersion}.",
+                    ExpectedConfigVersion,
+                    Config.Version
+                );
             }
-        }
-        
-        private readonly ILogger<BannedWords> _logger = logger;
-
-        public void BannedWordsDebug(string msg)
-        {
-            _logger.LogInformation($"[DEBUG] {msg}\n");
         }
 
         private static string ExtractChatMessage(CommandInfo message)
@@ -89,7 +87,7 @@ namespace BannedWords
 
             string normalizedPattern = pattern.Replace("\b", "\\b");
 
-            _logger.LogInformation(
+            Logger.LogInformation(
                 "Normalized JSON backspace escape(s) in banned word regex for PlayerBanType '{PlayerBanType}'. Use '\\\\b' in JSON config for regex word boundaries.",
                 playerBanType
             );
@@ -109,7 +107,7 @@ namespace BannedWords
                 {
                     if (string.IsNullOrWhiteSpace(pattern))
                     {
-                        _logger.LogWarning("Skipping empty banned word regex for PlayerBanType '{PlayerBanType}'.", group.PlayerBanType);
+                        Logger.LogWarning("Skipping empty banned word regex for PlayerBanType '{PlayerBanType}'.", group.PlayerBanType);
                         continue;
                     }
 
@@ -120,7 +118,7 @@ namespace BannedWords
                     }
                     catch (ArgumentException ex)
                     {
-                        _logger.LogWarning(
+                        Logger.LogWarning(
                             ex,
                             "Skipping invalid banned word regex '{Pattern}' for PlayerBanType '{PlayerBanType}'.",
                             pattern,
@@ -148,7 +146,7 @@ namespace BannedWords
 
                 int compiledPatternCount = Config.BanSettingsGroups.Sum(group => group.CompiledBannedWords.Length);
 
-                _logger.LogInformation(
+                Logger.LogInformation(
                     "Reloaded config from '{ConfigPath}'. Prepared {CompiledPatternCount} regex pattern(s) across {GroupCount} group(s).",
                     Config.GetConfigPath(),
                     compiledPatternCount,
@@ -161,7 +159,7 @@ namespace BannedWords
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to reload BannedWords config.");
+                Logger.LogError(ex, "Failed to reload BannedWords config.");
                 command.ReplyToCommand($"[BannedWords] {ChatColors.LightRed}Failed to reload configuration: {ex.Message}");
             }
         }
@@ -210,7 +208,7 @@ namespace BannedWords
 
                     if (!IsValidBanType(playerBanType))
                     {
-                        _logger.LogWarning($"Invalid PlayerBanType '{group.PlayerBanType}'. Command '{command}' will fail.");
+                        Logger.LogWarning("Invalid PlayerBanType '{PlayerBanType}'. Command '{Command}' will fail.", group.PlayerBanType, command);
                         return HookResult.Stop;
                     }
 
@@ -252,7 +250,7 @@ namespace BannedWords
 
                     if (!group.PrintToPlayerChat && !group.PrintToAllChat)
                     {
-                        _logger.LogWarning($"Both PrintToPlayerChat and PrintToAllChat are disabled for PlayerBanType: {group.PlayerBanType}. No messages will be sent.");
+                        Logger.LogWarning("Both PrintToPlayerChat and PrintToAllChat are disabled for PlayerBanType '{PlayerBanType}'. No messages will be sent.", group.PlayerBanType);
                     }
 
                     return HookResult.Stop;
