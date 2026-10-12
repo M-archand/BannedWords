@@ -277,6 +277,12 @@ namespace BannedWords
                         return HookResult.Stop;
                     }
 
+                    if (player.UserId is not int userId)
+                    {
+                        Logger.LogWarning("Could not resolve UserId for '{PlayerName}'. Message blocked without punishment.", player.PlayerName);
+                        return HookResult.Stop;
+                    }
+
                     string command = $"css_{playerBanType}";
 
                     // Determine duration and reason
@@ -287,15 +293,15 @@ namespace BannedWords
                     string executeCommand;
                     if (string.IsNullOrWhiteSpace(duration) && string.IsNullOrWhiteSpace(reason))
                     {
-                        executeCommand = $"{command} #{player.UserId}";
+                        executeCommand = $"{command} #{userId}";
                     }
                     else if (string.IsNullOrWhiteSpace(duration))
                     {
-                        executeCommand = $"{command} #{player.UserId} {reason}";
+                        executeCommand = $"{command} #{userId} {reason}";
                     }
                     else
                     {
-                        executeCommand = $"{command} #{player.UserId} {duration} {reason}";
+                        executeCommand = $"{command} #{userId} {duration} {reason}";
                     }
 
                     // Execute the appropriate command
