@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Extensions;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Admin;
+using System.Collections.Frozen;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 
@@ -164,7 +165,7 @@ namespace BannedWords
                 return;
             }
 
-            if (!IsValidBanType(playerBanType))
+            if (!ValidBanTypes.Contains(playerBanType))
             {
                 Logger.LogWarning("Invalid PlayerBanType '{PlayerBanType}'. Matching messages will be blocked without punishment.", group.PlayerBanType);
                 return;
@@ -324,12 +325,9 @@ namespace BannedWords
             return HookResult.Continue;
         }
 
-        private static bool IsValidBanType(string banType)
-        {
-            // List of known valid ban types
-            var validBanTypes = new[] { "mute", "smute", "tmute", "gag", "sgag", "tgag", "silence", "ban", "kick", }; // Add more valid types as needed
-            return validBanTypes.Contains(banType);
-        }
+        // SimpleAdmin css_<type> commands this plugin can issue. Each needs <type>msgplayer and <type>msgserver in lang/ file
+        private static readonly FrozenSet<string> ValidBanTypes =
+            new[] { "mute", "smute", "tmute", "gag", "sgag", "tgag", "silence", "ban", "kick" }.ToFrozenSet();
 
         public override void Unload(bool hotReload)
         {
@@ -341,12 +339,6 @@ namespace BannedWords
 
     public static class LocalizerKeys
     {
-        public const string SilenceMsgPlayer = "silencemsgplayer";
-        public const string SilenceMsgServer = "silencemsgserver";
-        public const string GagMsgPlayer = "gagmsgplayer";
-        public const string GagMsgServer = "gagmsgserver";
-        public const string TGagMsgPlayer = "tgagmsgplayer";
-        public const string TGagMsgServer = "tgagmsgserver";
         public const string BanReason = "banreason";
         public const string BanInfo = "baninfo";
     }
