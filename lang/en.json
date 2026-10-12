@@ -9,6 +9,14 @@
   "kickmsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been kicked {1}",
   "banmsgplayer": "{Lime}[SERVER] {Default}You have been automatically banned for {0} minutes {1}",
   "banmsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been banned {1}",
+  "smutemsgplayer": "{Lime}[SERVER] {Default}You have automatically been muted for {0} minutes {1}",
+  "smutemsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been muted {1}",
+  "tmutemsgplayer": "{Lime}[SERVER] {Default}You have automatically been muted for {0} minutes {1}",
+  "tmutemsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been muted {1}",
+  "sgagmsgplayer": "{Lime}[SERVER] {Default}You have automatically been gagged for {0} minutes {1}",
+  "sgagmsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been gagged {1}",
+  "tgagmsgplayer": "{Lime}[SERVER] {Default}You have automatically been gagged for {0} minutes {1}",
+  "tgagmsgserver": "{Lime}[SERVER] {LightRed}{0} {Default}has automatically been gagged {1}",
   "banreason": "Banned Phrase",
   "baninfo": "{Lime}[SERVER] {Default}Naughty naughty! That phrase isn't allowed. {LightRed}RULES: {Default}No Racism, Sexism, Homophobia, Transphobia, Politics. Don't be an asshole."
 }
