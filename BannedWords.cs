@@ -97,9 +97,13 @@ namespace BannedWords
             return normalizedPattern;
         }
 
+        // banreason from lang/ folder, cleaned for use inside a console command
+        private string _banReason = string.Empty;
+
         private void PrepareRuntimeConfig(BannedWordsConfig config)
         {
             config.ExcludedStartCharacters = [.. (config.ExcludeStartsWith ?? string.Empty).Distinct()];
+            _banReason = SanitizeConsoleArgument(Localizer[LocalizerKeys.BanReason], LocalizerKeys.BanReason);
 
             foreach (var group in config.BanSettingsGroups)
             {
@@ -216,6 +220,23 @@ namespace BannedWords
             group.ValidatedDuration = duration;
         }
 
+        // In console ';'  and '"' will fuck shit up
+        private string SanitizeConsoleArgument(string value, string langKey)
+        {
+            string cleaned = new(value.Where(c => c is not (';' or '"') && !char.IsControl(c)).ToArray());
+
+            if (cleaned.Length != value.Length)
+            {
+                Logger.LogWarning(
+                    "Lang key '{LangKey}' contains ';', '\"' or control characters. They were removed; using '{Value}'.",
+                    langKey,
+                    cleaned
+                );
+            }
+
+            return cleaned;
+        }
+
         private void WarnIfMissingLangKey(string key)
         {
             if (Localizer[key].ResourceNotFound)
@@ -296,7 +317,7 @@ namespace BannedWords
 
                     // Determine duration and reason
                     string duration = group.ValidatedDuration;
-                    string reason = group.EnableReason ? Localizer[LocalizerKeys.BanReason] : string.Empty;
+                    string reason = group.EnableReason ? _banReason : string.Empty;
 
                     // Build the executeCommand string dynamically
                     string executeCommand;
