@@ -60,10 +60,10 @@ namespace BannedWords
         };
 
         [JsonPropertyName("ReloadPermission")]
-        public string ReloadPermission { get; set; } = "@css/admin";
+        public string ReloadPermission { get; set; } = "@css/generic";
 
         [JsonPropertyName("WhitelistPermission")]
-        public string WhitelistPermission { get; set; } = "@css/admin";
+        public string WhitelistPermission { get; set; } = "@css/generic";
 
         [JsonPropertyName("ExcludeStartsWith")]
         public string ExcludeStartsWith { get; set; } = "!/.";
