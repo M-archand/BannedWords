@@ -77,7 +77,7 @@ namespace BannedWords
                 return HookResult.Continue;
             }
 
-            return HandlePlayerChat(player, info, isTeamChat: command == "say_team");
+            return HandlePlayerChat(player, info);
         }
 
         private string NormalizeRegexPattern(string pattern, string? playerBanType)
@@ -243,14 +243,9 @@ namespace BannedWords
             }
         }
 
-        private HookResult HandlePlayerChat(CCSPlayerController? player, CommandInfo message, bool isTeamChat)
+        private HookResult HandlePlayerChat(CCSPlayerController player, CommandInfo message)
         {
             string normalizedMessage = ExtractChatMessage(message);
-
-            if (player == null || !player.IsValid || player.IsBot)
-            {
-                return HookResult.Continue;
-            }
 
             if (string.IsNullOrWhiteSpace(normalizedMessage))
             {
