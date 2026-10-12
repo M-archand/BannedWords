@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Extensions;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BannedWords
 {
+    [MinimumApiVersion(80)]
     public partial class BannedWords : BasePlugin, IPluginConfig<BannedWordsConfig>
     {
         internal const int ExpectedConfigVersion = 1;
