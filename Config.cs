@@ -46,7 +46,7 @@ namespace BannedWords
                 EnableReason = true,
                 PrintToPlayerChat = true,
                 PrintToAllChat = true,
-                BannedWords = ["(?i)word1", "(?i)word2", "(?i)word3"]
+                BannedWords = ["word1", "word2", "word3"]
             },
             new BanSettingsGroup
             {
@@ -55,7 +55,7 @@ namespace BannedWords
                 EnableReason = true,
                 PrintToPlayerChat = true,
                 PrintToAllChat = true,
-                BannedWords = ["(?i)word4", "(?i)word5", "(?i)word6"]
+                BannedWords = ["word4", "word5", "word6"]
             }
         };
 
@@ -67,6 +67,10 @@ namespace BannedWords
 
         [JsonPropertyName("ExcludeStartsWith")]
         public string ExcludeStartsWith { get; set; } = "!/.";
+
+        // Applies RegexOptions.IgnoreCase to every pattern. Use inline (?-i) for a case-sensitive pattern.
+        [JsonPropertyName("IgnoreCase")]
+        public bool IgnoreCase { get; set; } = true;
 
         [JsonIgnore]
         public HashSet<char> ExcludedStartCharacters { get; set; } = [];

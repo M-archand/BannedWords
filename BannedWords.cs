@@ -105,6 +105,12 @@ namespace BannedWords
             config.ExcludedStartCharacters = [.. (config.ExcludeStartsWith ?? string.Empty).Distinct()];
             _banReason = SanitizeConsoleArgument(Localizer[LocalizerKeys.BanReason], LocalizerKeys.BanReason);
 
+            RegexOptions regexOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
+            if (config.IgnoreCase)
+            {
+                regexOptions |= RegexOptions.IgnoreCase;
+            }
+
             foreach (var group in config.BanSettingsGroups)
             {
                 var compiledPatterns = new List<Regex>();
@@ -120,7 +126,7 @@ namespace BannedWords
                     try
                     {
                         string normalizedPattern = NormalizeRegexPattern(pattern, group.PlayerBanType);
-                        compiledPatterns.Add(new Regex(normalizedPattern, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+                        compiledPatterns.Add(new Regex(normalizedPattern, regexOptions));
                     }
                     catch (ArgumentException ex)
                     {
