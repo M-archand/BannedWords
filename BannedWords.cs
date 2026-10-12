@@ -128,6 +128,11 @@ namespace BannedWords
                 }
 
                 group.CompiledBannedWords = [.. compiledPatterns];
+
+                if (group.CompiledBannedWords.Length == 0)
+                {
+                    Logger.LogWarning("No usable banned word regex for PlayerBanType '{PlayerBanType}'. This group will never match.", group.PlayerBanType);
+                }
             }
         }
 

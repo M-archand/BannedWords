@@ -13,16 +13,16 @@ namespace BannedWords
         public string? DurationInMinutes { get; set; }
 
         [JsonPropertyName("EnableReason")]
-        public required bool EnableReason { get; set; }
+        public bool EnableReason { get; set; } = true;
 
         [JsonPropertyName("PrintToPlayerChat")]
-        public required bool PrintToPlayerChat { get; set; }
+        public bool PrintToPlayerChat { get; set; } = true;
 
         [JsonPropertyName("PrintToAllChat")]
-        public required bool PrintToAllChat { get; set; }
+        public bool PrintToAllChat { get; set; } = false;
 
         [JsonPropertyName("BannedWords")]
-        public required string[] BannedWords { get; set; }
+        public string[] BannedWords { get; set; } = [];
 
         [JsonIgnore]
         public Regex[] CompiledBannedWords { get; set; } = [];
