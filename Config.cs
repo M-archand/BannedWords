@@ -26,6 +26,12 @@ namespace BannedWords
 
         [JsonIgnore]
         public Regex[] CompiledBannedWords { get; set; } = [];
+
+        [JsonIgnore]
+        public string? ValidatedBanType { get; set; }
+
+        [JsonIgnore]
+        public string ValidatedDuration { get; set; } = string.Empty;
     }
 
     public class BannedWordsConfig : BasePluginConfig

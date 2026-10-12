@@ -132,6 +132,83 @@ namespace BannedWords
                 {
                     Logger.LogWarning("No usable banned word regex for PlayerBanType '{PlayerBanType}'. This group will never match.", group.PlayerBanType);
                 }
+
+                ValidateBanSettings(group);
+
+                if (group.ValidatedBanType == null)
+                {
+                    WarnIfMissingLangKey(LocalizerKeys.BanInfo);
+                }
+            }
+
+            Logger.LogInformation(
+                "Prepared {CompiledPatternCount} regex pattern(s) across {GroupCount} group(s).",
+                config.BanSettingsGroups.Sum(group => group.CompiledBannedWords.Length),
+                config.BanSettingsGroups.Count
+            );
+        }
+
+        // Plain minutes ("10") or SimpleAdmin time units ("1h", "1h30m")
+        private static readonly Regex DurationPattern = new(@"^(\d+|(\d+(mo|m|h|d|w|y))+)$", RegexOptions.CultureInvariant);
+
+        private void ValidateBanSettings(BanSettingsGroup group)
+        {
+            group.ValidatedBanType = null;
+            group.ValidatedDuration = string.Empty;
+
+            string playerBanType = group.PlayerBanType?.Trim().ToLowerInvariant() ?? string.Empty;
+            string duration = group.DurationInMinutes?.Trim() ?? string.Empty;
+
+            if (playerBanType.Length == 0)
+            {
+                return;
+            }
+
+            if (!IsValidBanType(playerBanType))
+            {
+                Logger.LogWarning("Invalid PlayerBanType '{PlayerBanType}'. Matching messages will be blocked without punishment.", group.PlayerBanType);
+                return;
+            }
+
+            if (duration.Length > 0 && !DurationPattern.IsMatch(duration))
+            {
+                Logger.LogWarning(
+                    "Invalid DurationInMinutes '{DurationInMinutes}' for PlayerBanType '{PlayerBanType}'. Use a number of minutes such as \"10\". Matching messages will be blocked without punishment.",
+                    group.DurationInMinutes,
+                    group.PlayerBanType
+                );
+                return;
+            }
+
+            if (!group.PrintToPlayerChat && !group.PrintToAllChat)
+            {
+                Logger.LogWarning("Both PrintToPlayerChat and PrintToAllChat are disabled for PlayerBanType '{PlayerBanType}'. No messages will be sent.", group.PlayerBanType);
+            }
+
+            if (group.PrintToPlayerChat)
+            {
+                WarnIfMissingLangKey($"{playerBanType}msgplayer");
+            }
+
+            if (group.PrintToAllChat)
+            {
+                WarnIfMissingLangKey($"{playerBanType}msgserver");
+            }
+
+            if (group.EnableReason)
+            {
+                WarnIfMissingLangKey(LocalizerKeys.BanReason);
+            }
+
+            group.ValidatedBanType = playerBanType;
+            group.ValidatedDuration = duration;
+        }
+
+        private void WarnIfMissingLangKey(string key)
+        {
+            if (Localizer[key].ResourceNotFound)
+            {
+                Logger.LogWarning("Missing lang key '{LangKey}'. Chat will show the key name instead of a message.", key);
             }
         }
 
@@ -150,12 +227,7 @@ namespace BannedWords
 
                 int compiledPatternCount = Config.BanSettingsGroups.Sum(group => group.CompiledBannedWords.Length);
 
-                Logger.LogInformation(
-                    "Reloaded config from '{ConfigPath}'. Prepared {CompiledPatternCount} regex pattern(s) across {GroupCount} group(s).",
-                    Config.GetConfigPath(),
-                    compiledPatternCount,
-                    Config.BanSettingsGroups.Count
-                );
+                Logger.LogInformation("Reloaded config from '{ConfigPath}'.", Config.GetConfigPath());
 
                 command.ReplyToCommand(
                     $"[BannedWords] {ChatColors.Lime}Configuration reloaded successfully. Loaded {compiledPatternCount} regex pattern(s)."
@@ -199,25 +271,18 @@ namespace BannedWords
 
                 if (matchedPattern != null)
                 {
-                    string? configuredPlayerBanType = group.PlayerBanType?.Trim();
+                    string? playerBanType = group.ValidatedBanType;
 
-                    if (string.IsNullOrWhiteSpace(configuredPlayerBanType))
+                    if (playerBanType == null)
                     {
                         player.PrintToChat(Localizer[LocalizerKeys.BanInfo]);
                         return HookResult.Stop;
                     }
 
-                    string playerBanType = configuredPlayerBanType.ToLowerInvariant();
                     string command = $"css_{playerBanType}";
 
-                    if (!IsValidBanType(playerBanType))
-                    {
-                        Logger.LogWarning("Invalid PlayerBanType '{PlayerBanType}'. Command '{Command}' will fail.", group.PlayerBanType, command);
-                        return HookResult.Stop;
-                    }
-
                     // Determine duration and reason
-                    string duration = !string.IsNullOrEmpty(group.DurationInMinutes) ? group.DurationInMinutes : string.Empty;
+                    string duration = group.ValidatedDuration;
                     string reason = group.EnableReason ? Localizer[LocalizerKeys.BanReason] : string.Empty;
 
                     // Build the executeCommand string dynamically
@@ -250,11 +315,6 @@ namespace BannedWords
                     if (group.PrintToAllChat)
                     {
                         Server.PrintToChatAll(serverMessage);
-                    }
-
-                    if (!group.PrintToPlayerChat && !group.PrintToAllChat)
-                    {
-                        Logger.LogWarning("Both PrintToPlayerChat and PrintToAllChat are disabled for PlayerBanType '{PlayerBanType}'. No messages will be sent.", group.PlayerBanType);
                     }
 
                     return HookResult.Stop;
