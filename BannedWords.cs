@@ -4,7 +4,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Extensions;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Admin;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 
@@ -204,7 +203,7 @@ namespace BannedWords
 
                     if (string.IsNullOrWhiteSpace(configuredPlayerBanType))
                     {
-                        player.PrintToChat(Chat.FormatMessage(Localizer[LocalizerKeys.BanInfo]));
+                        player.PrintToChat(Localizer[LocalizerKeys.BanInfo]);
                         return HookResult.Stop;
                     }
 
@@ -240,8 +239,8 @@ namespace BannedWords
                     Server.ExecuteCommand(executeCommand.Trim());
 
                     // Display messages to the player and server
-                    string playerMessage = Chat.FormatMessage(Localizer[$"{playerBanType}msgplayer", duration, reason]);
-                    string serverMessage = Chat.FormatMessage(Localizer[$"{playerBanType}msgserver", player.PlayerName, reason]);
+                    string playerMessage = Localizer[$"{playerBanType}msgplayer", duration, reason];
+                    string serverMessage = Localizer[$"{playerBanType}msgserver", player.PlayerName, reason];
 
                     if (group.PrintToPlayerChat)
                     {
@@ -270,20 +269,6 @@ namespace BannedWords
             // List of known valid ban types
             var validBanTypes = new[] { "mute", "smute", "tmute", "gag", "sgag", "tgag", "silence", "ban", "kick", }; // Add more valid types as needed
             return validBanTypes.Contains(banType);
-        }
-
-        public static class Chat
-        {
-            private static readonly Dictionary<string, char> PredefinedColors = 
-                typeof(ChatColors)
-                .GetFields(BindingFlags.Public | BindingFlags.Static)
-                .ToDictionary(
-                    field => $"{{{field.Name}}}", 
-                    field => (char)(field.GetValue(null) ?? '\x01')
-                );
-
-            public static string FormatMessage(string message) =>
-                PredefinedColors.Aggregate(message, (current, color) => current.Replace(color.Key, $"{color.Value}"));
         }
 
         public override void Unload(bool hotReload)
