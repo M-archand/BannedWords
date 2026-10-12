@@ -1,4 +1,4 @@
-﻿﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
